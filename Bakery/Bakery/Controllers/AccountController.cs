@@ -3,12 +3,13 @@ using System.Security.Claims;
 using Bakery.Context;
 using Bakery.DTOs;
 using Bakery.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Bakery.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("[Controller]")]
 public class AccountController : ControllerBase
@@ -28,6 +29,7 @@ public class AccountController : ControllerBase
     
     [HttpPost]
     [Route("Register")]
+    [Authorize(Policy = "RequireAdminRole")]
     public async Task<ActionResult> Register(RegisterDTO input)
     {
         try
@@ -76,6 +78,7 @@ public class AccountController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
     [HttpPost]
     [Route("Login")]
     public async Task<ActionResult> Login(LoginDTO input)

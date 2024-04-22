@@ -2,6 +2,7 @@ using System.Globalization;
 using Bakery.Context;
 using Bakery.DTOs;
 using Bakery.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace Bakery.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = "RequireManagerRole")]
 public class OrdersController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -19,6 +22,7 @@ public class OrdersController : ControllerBase
     }
     //minimum query #2 from assignment 2
     [HttpGet("{id}")]
+    [Authorize(Policy = "RequireDriverRole")]
     public IActionResult GetOrderDetails(int id)
     {
         var order = _context.Orders
@@ -44,6 +48,7 @@ public class OrdersController : ControllerBase
 
     //query #3 from assignment 2
     [HttpGet("{id}/bakingGoods")]
+    [Authorize(Policy = "RequireDriverRole")]
     public IActionResult GetBakingGoodsInOrder(int id)
     {
         var order = _context.Orders.Find(id);
@@ -66,6 +71,7 @@ public class OrdersController : ControllerBase
 
     //query #5 from assignment 2
     [HttpGet("{id}/deliveries")]
+    [Authorize(Policy = "RequireDriverRole")]
     public IActionResult GetDeliveriesForOrder(int id)
     {
         var order = _context.Orders.Find(id);

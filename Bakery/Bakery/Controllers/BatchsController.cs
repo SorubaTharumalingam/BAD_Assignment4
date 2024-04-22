@@ -1,10 +1,12 @@
 using Bakery.Context;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bakery.Controllers;
 [ApiController]
 [Route("[controller]")]
-
+[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = "RequireManagerRole")]
 public class BatchsController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -15,6 +17,7 @@ public class BatchsController : ControllerBase
     }
 
     //query #4 from assignment 2
+    [Authorize(Policy = "RequireBakerRole")]
     [HttpGet("{id}/ingredients")]
     public IActionResult GetIngredientsInBatch(int id)
     {
@@ -39,8 +42,9 @@ public class BatchsController : ControllerBase
         return Ok(ingredients);
     }
 
-    //query #6 from assignment 2
+    //query #7 from assignment 2
     [HttpGet("averageDelay")]
+    [Authorize(Policy = "RequireBakerRole")]
     public IActionResult GetAverageDelay()
     {
         var batches = _context.Batches.ToList();

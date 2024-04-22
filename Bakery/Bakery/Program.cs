@@ -4,7 +4,9 @@ using Bakery.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,9 +49,48 @@ builder.Services.AddAuthentication(options =>
 });
 
 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(
+    // Login is the only endpoint accessible for anonymous users.
+    options =>
+    {
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
+        });
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
+
+
+// creating roles:
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("Admin","true"));
+    options.AddPolicy("RequireManagerRole", policy => policy.RequireClaim("Manager","true"));
+    options.AddPolicy("RequireBakerRole", policy => policy.RequireClaim("Baker","true"));
+    options.AddPolicy("RequireDriverRole", policy => policy.RequireClaim("Driver","true"));
+});
+
 
 var app = builder.Build();
 

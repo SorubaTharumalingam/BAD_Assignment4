@@ -1,12 +1,15 @@
 using Bakery.Context;
 using Bakery.DTOs;
 using Bakery.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bakery.Controllers;
 [ApiController]
 [Route("[controller]")]
+[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = "RequireManagerRole")]
 public class IngredientsController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -19,6 +22,7 @@ public class IngredientsController : ControllerBase
 
     //minimum query #1 from assignment 2
     [HttpGet("ingredients")]
+    [Authorize(Policy = "RequireBakerRole")]
     public IActionResult GetAllIngredientsWithQuantities()
     {
         var ingredients = _context.Ingredients
@@ -37,6 +41,7 @@ public class IngredientsController : ControllerBase
 
     //minimum query #4 from assignment 2
     [HttpGet("batch/{batchId}")]
+    [Authorize(Policy = "RequireBakerRole")]
     public IActionResult GetIngredientsForBatch(int batchId)
     {
         var batchIngredients = _context.BatchIngredients
@@ -70,6 +75,7 @@ public class IngredientsController : ControllerBase
 
 
     [HttpGet("stock/{ingredientName}")]
+    [Authorize(Policy = "RequireBakerRole")]
     public IActionResult GetIngredientStock(string ingredientName)
     {
         var ingredient = _context.Ingredients
@@ -86,6 +92,7 @@ public class IngredientsController : ControllerBase
 
     // C. update ingredient in stock
     [HttpPut("update-quantity-by-name/{name}")]
+    [Authorize(Policy = "RequireBakerRole")]
     public IActionResult UpdateIngredient(string name, [FromBody] IngredientQuantityDto ingredientDto)
     {
         if (!ModelState.IsValid)
