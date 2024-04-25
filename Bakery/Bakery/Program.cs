@@ -7,8 +7,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// add logger
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+    config.WriteTo.Console();
+});
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -17,6 +26,12 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 
 builder.Services.AddControllers();
 
+// adding mongoDB service for endpoint searching in the logs
+builder.Services.AddSingleton<IMongoClient, MongoClient>(sp =>
+{
+   // DOES NOT WORK:  var settings = sp.GetRequiredService<IConfiguration>().GetSection("MongoDB").Get<MongoSettings>();
+   // DOES NOT WORK: return new MongoClient(settings.ConnectionString);
+});
 // Adding Core Identity service to service container
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -110,7 +125,6 @@ builder.Services.AddAuthorization(options =>
             (c.Type == "IsManager" && c.Value == "true")
         )));
 });
-
 
 var app = builder.Build();
 

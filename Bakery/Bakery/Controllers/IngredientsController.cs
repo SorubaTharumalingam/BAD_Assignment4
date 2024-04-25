@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Bakery.Controllers;
 [ApiController]
 [Route("[controller]")]
-//[Authorize(Policy = "RequireAdminRole")]
-//[Authorize(Policy = "RequireManagerRole")]
 [Authorize]
 public class IngredientsController : ControllerBase
 {
     private readonly MyDbContext _context;
-
-    public IngredientsController(MyDbContext context)
+    private readonly ILogger<IngredientsController> _logger;
+    
+    public IngredientsController(MyDbContext context, ILogger<IngredientsController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
 
@@ -96,6 +96,12 @@ public class IngredientsController : ControllerBase
     [Authorize(Policy = "RequireAdminRole")]
     public IActionResult UpdateIngredient(string name, [FromBody] IngredientQuantityDto ingredientDto)
     {
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
+        var logInfo = new { Operation = "Put" , User =  userIdentity, Timestamp = timestamp};
+        
+        _logger.LogInformation("Put update quantity of ingredients by name called {@LogInfo} ", logInfo);
+        
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -131,7 +137,14 @@ public class IngredientsController : ControllerBase
     [HttpPost]
     [Authorize(Policy = "RequireAdminRole")]
     public IActionResult AddIngredient([FromBody] IngredientNameQuantityDto ingredientDto)
-    {
+    {  
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
+        var logInfo = new { Operation = "Post" , User =  userIdentity, Timestamp = timestamp};
+        
+        _logger.LogInformation("Post AddIngredient  {@LogInfo} ", logInfo);
+
+   
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -178,6 +191,12 @@ public class IngredientsController : ControllerBase
     [Authorize(Policy = "RequireAdminRole")]
     public IActionResult DeleteIngredient(int id)
     {
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
+        var logInfo = new { Operation = "Delete" , User =  userIdentity, Timestamp = timestamp};
+        
+        _logger.LogInformation("Delete DeleteIngredient  {@LogInfo} ", logInfo);
+        
         var ingredient = _context.Ingredients.Find(id);
         if (ingredient == null)
         {

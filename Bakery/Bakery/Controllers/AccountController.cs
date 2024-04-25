@@ -18,13 +18,16 @@ public class AccountController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly ILogger<AccountController> _logger;
 
-    public AccountController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+    public AccountController(MyDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration,  ILogger<AccountController> logger)
     {
         _context = context;
         _configuration = configuration;
         _userManager = userManager;
         _signInManager = signInManager;
+        _logger = logger;
+
     }
     
     [HttpPost]
@@ -32,6 +35,12 @@ public class AccountController : ControllerBase
     [Authorize(Policy = "RequireAdminRole")]
     public async Task<ActionResult> Register(RegisterDTO input)
     {
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
+        var logInfo = new { Operation = "Post" , User =  userIdentity, Timestamp = timestamp};
+        
+        _logger.LogInformation("Post Register  {@LogInfo} ", logInfo);
+
         try
         {
             if (ModelState.IsValid)
@@ -83,6 +92,12 @@ public class AccountController : ControllerBase
     [Route("Login")]
     public async Task<ActionResult> Login(LoginDTO input)
     {
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
+        var logInfo = new { Operation = "Post" , User =  userIdentity, Timestamp = timestamp};
+        
+        _logger.LogInformation("Post Login  {@LogInfo} ", logInfo);
+        
         try
         {
             if (ModelState.IsValid)
