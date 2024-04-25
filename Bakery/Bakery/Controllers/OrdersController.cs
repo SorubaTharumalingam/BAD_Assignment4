@@ -10,8 +10,7 @@ namespace Bakery.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize(Policy = "RequireAdminRole")]
-[Authorize(Policy = "RequireManagerRole")]
+[Authorize]
 public class OrdersController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -22,7 +21,7 @@ public class OrdersController : ControllerBase
     }
     //minimum query #2 from assignment 2
     [HttpGet("{id}")]
-    [Authorize(Policy = "RequireDriverRole")]
+    [Authorize(Policy = "RequireAdminManagerOrDriverRole")]
     public IActionResult GetOrderDetails(int id)
     {
         var order = _context.Orders
@@ -48,7 +47,7 @@ public class OrdersController : ControllerBase
 
     //query #3 from assignment 2
     [HttpGet("{id}/bakingGoods")]
-    [Authorize(Policy = "RequireDriverRole")]
+    [Authorize(Policy = "RequireAdminManagerOrDriverRole")]
     public IActionResult GetBakingGoodsInOrder(int id)
     {
         var order = _context.Orders.Find(id);
@@ -71,7 +70,7 @@ public class OrdersController : ControllerBase
 
     //query #5 from assignment 2
     [HttpGet("{id}/deliveries")]
-    [Authorize(Policy = "RequireDriverRole")]
+    [Authorize(Policy = "RequireAdminManagerOrDriverRole")]
     public IActionResult GetDeliveriesForOrder(int id)
     {
         var order = _context.Orders.Find(id);
@@ -97,6 +96,7 @@ public class OrdersController : ControllerBase
 
     //query #6 from assignment 2
     [HttpGet("bakingGoods")]
+    [Authorize(Policy = "RequireAdminOrManager")]
     public IActionResult GetAllBakingGoodsQuantities()
     {
         var bakingGoods = _context.OrderBakingGoods

@@ -25,8 +25,8 @@ public class SeedController : ControllerBase
     {
         SeedUsers(_userManager);
 
-        // var seedData = new SeedData();
-        // seedData.Seed(_context);
+        var seedData = new SeedData();
+        seedData.Seed(_context);
     }
     
     public static void SeedUsers(UserManager<ApplicationUser> userManager)

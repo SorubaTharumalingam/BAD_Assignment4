@@ -8,8 +8,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Bakery.Controllers;
 [ApiController]
 [Route("[controller]")]
-[Authorize(Policy = "RequireAdminRole")]
-[Authorize(Policy = "RequireManagerRole")]
+//[Authorize(Policy = "RequireAdminRole")]
+//[Authorize(Policy = "RequireManagerRole")]
+[Authorize]
 public class IngredientsController : ControllerBase
 {
     private readonly MyDbContext _context;
@@ -22,7 +23,7 @@ public class IngredientsController : ControllerBase
 
     //minimum query #1 from assignment 2
     [HttpGet("ingredients")]
-    [Authorize(Policy = "RequireBakerRole")]
+    [Authorize(Policy = "RequireAdminManagerOrBakerRole")]
     public IActionResult GetAllIngredientsWithQuantities()
     {
         var ingredients = _context.Ingredients
@@ -41,7 +42,7 @@ public class IngredientsController : ControllerBase
 
     //minimum query #4 from assignment 2
     [HttpGet("batch/{batchId}")]
-    [Authorize(Policy = "RequireBakerRole")]
+    [Authorize(Policy = "RequireAdminManagerOrBakerRole")]
     public IActionResult GetIngredientsForBatch(int batchId)
     {
         var batchIngredients = _context.BatchIngredients
@@ -75,7 +76,7 @@ public class IngredientsController : ControllerBase
 
 
     [HttpGet("stock/{ingredientName}")]
-    [Authorize(Policy = "RequireBakerRole")]
+    [Authorize(Policy = "RequireAdminManagerOrBakerRole")]
     public IActionResult GetIngredientStock(string ingredientName)
     {
         var ingredient = _context.Ingredients
@@ -92,7 +93,7 @@ public class IngredientsController : ControllerBase
 
     // C. update ingredient in stock
     [HttpPut("update-quantity-by-name/{name}")]
-    [Authorize(Policy = "RequireBakerRole")]
+    [Authorize(Policy = "RequireAdminRole")]
     public IActionResult UpdateIngredient(string name, [FromBody] IngredientQuantityDto ingredientDto)
     {
         if (!ModelState.IsValid)
@@ -128,6 +129,7 @@ public class IngredientsController : ControllerBase
 
     // C. Add new ingredient and quantity to the stock
     [HttpPost]
+    [Authorize(Policy = "RequireAdminRole")]
     public IActionResult AddIngredient([FromBody] IngredientNameQuantityDto ingredientDto)
     {
         if (!ModelState.IsValid)
@@ -173,6 +175,7 @@ public class IngredientsController : ControllerBase
 
     // C. Delete ingredient from stock
     [HttpDelete("{id}")]
+    [Authorize(Policy = "RequireAdminRole")]
     public IActionResult DeleteIngredient(int id)
     {
         var ingredient = _context.Ingredients.Find(id);

@@ -23,6 +23,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     // minimum requirements for user passwords
     options.Password.RequiredLength = 8;
     options.Password.RequireUppercase = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireNonAlphanumeric = true;
 }).AddEntityFrameworkStores<MyDbContext>();
 
 builder.Services.AddAuthentication(options =>
@@ -85,10 +88,27 @@ builder.Services.AddSwaggerGen(
 // creating roles:
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("Admin","true"));
-    options.AddPolicy("RequireManagerRole", policy => policy.RequireClaim("Manager","true"));
-    options.AddPolicy("RequireBakerRole", policy => policy.RequireClaim("Baker","true"));
-    options.AddPolicy("RequireDriverRole", policy => policy.RequireClaim("Driver","true"));
+    options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("IsAdmin","true"));
+    options.AddPolicy("RequireManagerRole", policy => policy.RequireClaim("IsManager","true"));
+    options.AddPolicy("RequireBakerRole", policy => policy.RequireClaim("IsBaker","true"));
+    options.AddPolicy("RequireDriverRole", policy => policy.RequireClaim("IsDriver","true"));
+    options.AddPolicy("RequireAdminManagerOrBakerRole", policy => policy.RequireAssertion(context =>
+        context.User.HasClaim(c => 
+            (c.Type == "IsAdmin" && c.Value == "true") || 
+            (c.Type == "IsManager" && c.Value == "true") || 
+            (c.Type == "IsBaker" && c.Value == "true")
+        )));
+    options.AddPolicy("RequireAdminManagerOrDriverRole", policy => policy.RequireAssertion(context =>
+        context.User.HasClaim(c => 
+            (c.Type == "IsAdmin" && c.Value == "true") || 
+            (c.Type == "IsManager" && c.Value == "true") || 
+            (c.Type == "IsDriver" && c.Value == "true")
+        )));
+    options.AddPolicy("RequireAdminOrManager", policy => policy.RequireAssertion(context =>
+        context.User.HasClaim(c => 
+            (c.Type == "IsAdmin" && c.Value == "true") || 
+            (c.Type == "IsManager" && c.Value == "true")
+        )));
 });
 
 

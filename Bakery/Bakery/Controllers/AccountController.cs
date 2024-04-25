@@ -98,6 +98,11 @@ public class AccountController : ControllerBase
                         SecurityAlgorithms.HmacSha256);
                     var claims = new List<Claim>();
                     claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+                    
+                    // Fetch the claims from the AspNetUserClaims table
+                    var userClaims = await _userManager.GetClaimsAsync(user);
+                    claims.AddRange(userClaims);
+                    
                     var jwtObject = new JwtSecurityToken(
                         issuer: _configuration["JWT:Issuer"],
                         audience: _configuration["JWT:Audience"],
