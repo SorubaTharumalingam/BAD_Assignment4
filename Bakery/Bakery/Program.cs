@@ -1,4 +1,5 @@
 
+using Bakery;
 using Bakery.Context;
 using Bakery.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,11 +28,13 @@ builder.Services.AddDbContext<MyDbContext>(options =>
 builder.Services.AddControllers();
 
 // adding mongoDB service for endpoint searching in the logs
+builder.Services.Configure<MongoSettings>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.AddSingleton<IMongoClient, MongoClient>(sp =>
 {
-   // DOES NOT WORK:  var settings = sp.GetRequiredService<IConfiguration>().GetSection("MongoDB").Get<MongoSettings>();
-   // DOES NOT WORK: return new MongoClient(settings.ConnectionString);
+   var settings = sp.GetRequiredService<IConfiguration>().GetSection("MongoDB").Get<MongoSettings>();
+   return new MongoClient(settings.ConnectionString);
 });
+
 // Adding Core Identity service to service container
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

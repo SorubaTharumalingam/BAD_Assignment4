@@ -98,7 +98,7 @@ public class IngredientsController : ControllerBase
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
-        var logInfo = new { Operation = "Put" , User =  userIdentity, Timestamp = timestamp};
+        var logInfo = new { Operation = "Put", User =  userIdentity, Timestamp = timestamp};
         
         _logger.LogInformation("Put update quantity of ingredients by name called {@LogInfo} ", logInfo);
         
@@ -140,7 +140,7 @@ public class IngredientsController : ControllerBase
     {  
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
-        var logInfo = new { Operation = "Post" , User =  userIdentity, Timestamp = timestamp};
+        var logInfo = new { Operation = "Post", User =  userIdentity, Timestamp = timestamp};
         
         _logger.LogInformation("Post AddIngredient  {@LogInfo} ", logInfo);
 
@@ -193,7 +193,7 @@ public class IngredientsController : ControllerBase
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var userIdentity = User.Identity.IsAuthenticated ? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value : "anonymous";
-        var logInfo = new { Operation = "Delete" , User =  userIdentity, Timestamp = timestamp};
+        var logInfo = new { Operation = "Delete", User =  userIdentity, Timestamp = timestamp};
         
         _logger.LogInformation("Delete DeleteIngredient  {@LogInfo} ", logInfo);
         
