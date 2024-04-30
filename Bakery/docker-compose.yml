@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  api:
+    image: bakeryapi:latest
+    container_name: bakery_api
+    ports:
+      - "5200:8080"
+    depends_on:
+      - mssql
+      - mongodb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=MySecretPassword123  
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+  mssql_data:

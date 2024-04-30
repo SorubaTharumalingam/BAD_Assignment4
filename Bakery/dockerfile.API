@@ -1,0 +1,21 @@
+# https://hub.docker.com/_/microsoft-dotnet
+
+# first stage: install and build the application
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY Bakery/*.csproj ./Bakery/
+RUN dotnet restore ./Bakery/Bakery.csproj
+
+# copy everything else and build app
+COPY . .
+WORKDIR /app/Bakery
+RUN dotnet publish -c Release -o /app/publish
+
+# second stage: run the application
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "Bakery.dll"]
